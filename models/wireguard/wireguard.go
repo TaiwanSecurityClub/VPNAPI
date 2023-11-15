@@ -10,6 +10,7 @@ import (
     "path/filepath"
     "regexp"
     "net/netip"
+    "sync"
 
     "github.com/google/uuid"
 
@@ -18,6 +19,8 @@ import (
     "WireguardAPI/models/privatekey"
 )
 
+var lock *sync.RWMutex
+
 type PeerData struct {
     Index int64 `json:"index"`
     Key string `json:"key"`
@@ -25,13 +28,14 @@ type PeerData struct {
 }
 
 func init() {
+    lock = new(sync.RWMutex)
     _, err := exec.LookPath("wg")
     if err != nil {
         log.Panicln("Please install wireguard.")
     }
 }
 
-func GetConfig(name string) (conf string, data map[string]string) {
+func getConfig(name string) (conf string, data map[string]string) {
     f, err := os.Open(filepath.Join(config.WGpath, fmt.Sprintf("%s.conf", name)))
     if err != nil {
         log.Panicln(err)
@@ -73,7 +77,7 @@ func GetConfig(name string) (conf string, data map[string]string) {
     return
 }
 
-func SetConfig(name, conf string) {
+func setConfig(name, conf string) {
     f, err := os.OpenFile(filepath.Join(config.WGpath, fmt.Sprintf("%s.conf", name)), os.O_RDWR|os.O_TRUNC, 0600)
     if err != nil {
         log.Panicln(err)
@@ -100,9 +104,12 @@ func SetConfig(name, conf string) {
 }
 
 func Reload(name string, datas []PeerData) bool {
+    lock.Lock()
+    defer lock.Unlock()
+
     splitcom := regexp.MustCompile(`\s*,\s*`)
     
-    conf, servervar := GetConfig(name)
+    conf, servervar := getConfig(name)
     conf += "\n"
     addressesarr := splitcom.Split(servervar["Address"], -1)
     for _, data := range datas {
@@ -127,12 +134,15 @@ PersistentKeepalive = %s
         )
     }
     conf += "\n"
-    SetConfig(name, conf)
+    setConfig(name, conf)
     return true
 }
 
 func GetPeerConfig(name string, data PeerData) string {
-    _, servervar := GetConfig(name)
+    lock.RLock()
+    defer lock.RUnlock()
+
+    _, servervar := getConfig(name)
     splitcom := regexp.MustCompile(`\s*,\s*`)
     addressesarr := splitcom.Split(servervar["Address"], -1)
     addresses := []string{}

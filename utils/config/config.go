@@ -6,6 +6,7 @@ import (
 )
 
 var WGpath string
+var Address string
 var Port string
 var Servername string
 var Debug bool
@@ -21,6 +22,7 @@ func init() {
     if !exists {
         WGpath = "/etc/wireguard"
     }
+    Address = os.Getenv("ADDRESS")
     Servername = os.Getenv("SERVERNAME")
     debugstr, exists := os.LookupEnv("DEBUG")
     if !exists {

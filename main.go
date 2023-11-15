@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
 
     "github.com/gin-gonic/gin"
     "github.com/go-errors/errors"
@@ -18,7 +19,7 @@ func main() {
     backend.Use(errorHandler)
     backend.Use(gin.CustomRecovery(panicHandler))
     router.Init(&backend.RouterGroup)
-    backend.Run(":"+string(config.Port))
+    backend.Run(fmt.Sprintf("%s:%s", config.Address, config.Port))
 }
 
 func panicHandler(c *gin.Context, err any) {

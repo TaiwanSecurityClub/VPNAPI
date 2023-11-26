@@ -32,5 +32,5 @@ func Pubkey(privkey string) string {
 
 func Generate() string {
     out, _ := exec.Command("wg", "genkey").Output()
-    return string(out)
+    return strings.TrimSpace(string(out))
 }

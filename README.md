@@ -1,6 +1,6 @@
 # WireguardAPI
 
-Append your wireguard peer by run this command in your ldap account.
+Append your wireguard peer by api.
 
 ## Build
 1. Install golang 1.19

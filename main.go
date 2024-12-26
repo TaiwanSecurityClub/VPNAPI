@@ -7,6 +7,7 @@ import (
     "github.com/go-errors/errors"
 
     "WireguardAPI/router"
+    "WireguardAPI/middlewares/token"
     "WireguardAPI/utils/config"
     "WireguardAPI/utils/errutil"
 )
@@ -18,6 +19,7 @@ func main() {
     backend := gin.Default()
     backend.Use(errorHandler)
     backend.Use(gin.CustomRecovery(panicHandler))
+    backend.Use(token.AddMeta)
     router.Init(&backend.RouterGroup)
     backend.Run(fmt.Sprintf("%s:%s", config.Address, config.Port))
 }

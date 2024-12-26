@@ -9,6 +9,7 @@ var WGpath string
 var Address string
 var Port string
 var Servername string
+var Token string
 var Debug bool
 
 func init() {
@@ -24,6 +25,7 @@ func init() {
     }
     Address = os.Getenv("ADDRESS")
     Servername = os.Getenv("SERVERNAME")
+    Token = os.Getenv("TOKEN")
     debugstr, exists := os.LookupEnv("DEBUG")
     if !exists {
         Debug = false

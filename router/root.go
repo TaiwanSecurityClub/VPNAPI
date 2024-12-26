@@ -8,6 +8,7 @@ import (
     "github.com/gin-gonic/gin"
     
     "WireguardAPI/utils/config"
+    "WireguardAPI/middlewares/token"
     "WireguardAPI/models/privatekey"
     "WireguardAPI/models/wireguard"
 )
@@ -16,9 +17,9 @@ var router *gin.RouterGroup
 
 func Init(r *gin.RouterGroup) {
     router = r
-    router.GET("/genkey", genkey)
-    router.POST("/reload", reload)
-    router.POST("/getconfig", getconfig)
+    router.GET("/genkey", token.CheckAuth, genkey)
+    router.POST("/reload", token.CheckAuth, reload)
+    router.POST("/getconfig", token.CheckAuth, getconfig)
 }
 
 func genkey(c *gin.Context) {
